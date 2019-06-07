@@ -14,6 +14,7 @@ import moepkg/editorview
 import moepkg/cmdoption
 import moepkg/settings
 import moepkg/commandview
+import moepkg/confmode
 
 proc main() =
   let parsedList = parseCommandLineOption(commandLineParams())
@@ -45,6 +46,7 @@ proc main() =
     of Mode.filer: filerMode(status)
     of Mode.search: searchMode(status)
     of Mode.bufManager: bufferManager(status)
+    of Mode.conf: configurationMode(status)
 
   exitEditor(status.settings)
 

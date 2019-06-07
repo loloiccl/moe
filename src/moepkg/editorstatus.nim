@@ -2,7 +2,16 @@ import packages/docutils/highlite, strutils, terminal, os, strformat
 import gapbuffer, editorview, ui, cursor, unicodeext, highlight, independentutils, fileutils
 
 type Mode* = enum
-  normal, insert, visual, visualBlock, replace, ex, filer, search, bufManager
+  normal
+  insert
+  visual
+  visualBlock
+  replace
+  ex
+  filer
+  search
+  bufManager
+  conf
 
 type SelectArea* = object
   startLine*: int
@@ -177,10 +186,13 @@ proc writeStatusBarFilerModeInfo(status: var EditorStatus) =
 
 proc writeStatusBarBufferManagerModeInfo(status: var EditorStatus) =
   let
-    color = EditorColorPair.statusBar
+    color = Editorcolorpair.statusbar
     info = fmt"{status.bufStatus[status.currentBuffer].currentLine + 1}/{status.bufStatus.len - 1}"
   status.statusWindow.append(ru " ".repeat(terminalWidth() - " BUFFER ".len), color)
   status.statusWindow.write(0, terminalWidth() - info.len - 1, info, color)
+
+proc writeStatusBarBufferConfModeInfo(status: var EditorStatus) =
+  status.statusWindow.append(ru " ".repeat(terminalWidth() - " CONFIG ".len), Editorcolorpair.statusbar)
 
 proc setModeStr(mode: Mode): string =
   case mode:
@@ -190,6 +202,7 @@ proc setModeStr(mode: Mode): string =
   of Mode.filer: result = " FILER "
   of Mode.bufManager: result = " BUFFER "
   of Mode.ex: result = " EX "
+  of Mode.conf: result = " CONFIG "
   else: result = " NORMAL "
 
 proc writeStatusBar*(status: var EditorStatus) =
@@ -202,19 +215,20 @@ proc writeStatusBar*(status: var EditorStatus) =
   if status.settings.statusBar.mode: status.statusWindow.write(0, 0, modeStr, color)
 
   if mode == Mode.ex and status.bufStatus[status.currentBuffer].prevMode == Mode.filer: writeStatusBarFilerModeInfo(status)
-  elif mode == Mode.ex: writeStatusBarNormalModeInfo(status)
-  elif mode == Mode.visual or mode == Mode.visualBlock: writeStatusBarNormalModeInfo(status)
-  elif mode == Mode.replace: writeStatusBarNormalModeInfo(status)
   elif mode == Mode.filer: writeStatusBarFilerModeInfo(status)
   elif mode == Mode.bufManager: writeStatusBarBufferManagerModeInfo(status)
+  elif mode == Mode.conf: writeStatusBarBufferConfModeInfo(status)
   else: writeStatusBarNormalModeInfo(status)
 
   status.statusWindow.refresh
 
-proc writeTab(tabWin: var Window, start, tabWidth: int, filename: string, color: EditorColorPair) =
-  let
-    title = if filename == "": "New file" else: filename
-    buffer = if filename.len < tabWidth: " " & title & " ".repeat(tabWidth - title.len) else: " " & (title).substr(0, tabWidth - 3) & "~"
+proc getTabTtitle(bufStatus: BufferStatus): string =
+  if bufStatus.mode == Mode.conf: return "Configuration mode"
+  elif bufStatus.mode == Mode.bufManager: return "Buffer manager"
+  else: return if bufStatus.filename == ru"": "New file" else: $bufStatus.filename
+
+proc writeTab(tabWin: var Window, start, tabWidth: int, filename, title: string, color: EditorColorPair) =
+  let buffer = if filename.len < tabWidth: " " & title & " ".repeat(tabWidth - title.len) else: " " & (title).substr(0, tabWidth - 3) & "~"
   tabWin.write(0, start, buffer, color)
 
 proc writeTabLine*(status: var EditorStatus) =
@@ -231,7 +245,7 @@ proc writeTabLine*(status: var EditorStatus) =
       currentMode = status.bufStatus[status.mainWindowInfo[i].bufferIndex].mode
       prevMode = status.bufStatus[status.mainWindowInfo[i].bufferIndex].prevMode
       filename = if (currentMode == Mode.filer) or (prevMode == Mode.filer and currentMode == Mode.ex): getCurrentDir() else: $status.bufStatus[status.mainWindowInfo[i].bufferIndex].filename
-    status.tabWindow.writeTab(i * tabWidth, tabWidth, filename, color)
+    status.tabWindow.writeTab(i * tabWidth, tabWidth, filename, status.bufStatus[status.mainWindowInfo[i].bufferIndex].getTabTtitle, color)
 
   status.tabWindow.refresh
 

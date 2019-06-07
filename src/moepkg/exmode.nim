@@ -25,6 +25,9 @@ proc parseReplaceCommand(command: seq[Rune]): replaceCommandInfo =
   
   return (searhWord: searchWord, replaceWord: replaceWord)
 
+proc isChangeConfigMode(command: seq[seq[Rune]]): bool =
+  return command.len == 1 and command[0] == ru"conf"
+
 proc isOpenBufferManager(command: seq[seq[Rune]]): bool =
   return command.len == 1 and command[0] == ru"buf"
 
@@ -118,6 +121,13 @@ proc isShellCommand(command: seq[seq[Rune]]): bool =
 proc isReplaceCommand(command: seq[seq[Rune]]): bool =
   return command.len >= 1  and command[0].len > 4 and command[0][0 .. 2] == ru"%s/"
 
+proc changeConfigMode(status: var Editorstatus) =
+  status.splitWindow
+  status.moveNextWindow
+  status.addNewBuffer("")
+  status.changeCurrentBuffer(status.bufStatus.high)
+  status.changeMode(Mode.conf)
+
 proc openBufferManager(status: var Editorstatus) =
   status.changeMode(status.bufStatus[status.currentBuffer].prevMode)
   status.splitWindow
@@ -162,7 +172,6 @@ proc syntaxSettingCommand(status: var EditorStatus, command: seq[Rune]) =
 
 proc tabStopSettingCommand(status: var EditorStatus, command: int) =
   status.settings.tabStop = command
-
   status.changeMode(status.bufStatus[status.currentBuffer].prevMode)
 
 proc autoCloseParenSettingCommand(status: var EditorStatus, command: seq[Rune]) =
@@ -464,6 +473,8 @@ proc exModeCommand(status: var EditorStatus, command: seq[seq[Rune]]) =
     listAllBufferCommand(status)
   elif isOpenBufferManager(command):
     openBufferManager(status)
+  elif isChangeConfigMode(command):
+    changeConfigMode(status)
   else:
     status.changeMode(status.bufStatus[status.currentBuffer].prevMode)
 
