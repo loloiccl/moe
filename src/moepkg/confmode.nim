@@ -1,9 +1,6 @@
 import terminal, sequtils
 import gapbuffer, editorstatus, editorview, ui, unicodeext, normalmode, highlight
 
-type SettingItems = enum
-  editorColorTheme
-
 proc cursorTypeToRune(cursorType: CursorType): seq[Rune] =
   case cursorType
   of CursorType.blockMode: return ru"block"
@@ -70,6 +67,8 @@ proc setConfigBuffer(bufStatus: var BufferStatus, settings: EditorSettings) =
   bufStatus.buffer.add(ru"directory ")
   bufStatus.buffer[bufStatus.buffer.high].insert(settings.statusBar.directory.boolToRune, bufStatus.buffer[bufStatus.buffer.high].len)
 
+  bufStatus.currentLine = 1
+
 proc initHighlight(bufStatus: var BufferStatus): Highlight =
   for i in 0 ..< bufStatus.buffer.len:
     let color = if i == bufStatus.currentLine: EditorColorPair.visualMode else: EditorColorPair.defaultChar
@@ -77,6 +76,14 @@ proc initHighlight(bufStatus: var BufferStatus): Highlight =
 
 proc exitConfigMode(status: var Editorstatus) =
   setCursor(true)
+
+proc cursorUp(bufStatus: var BufferStatus) =
+  keyUp(bufStatus)
+  while bufStatus.buffer[bufStatus.currentLine] == ru"" or  bufStatus.buffer[bufStatus.currentLine][0] == (ru"-")[0]: keyUp(bufStatus)
+
+proc cursorDown(bufStatus: var BufferStatus) =
+  keyDown(bufStatus)
+  while bufStatus.buffer[bufStatus.currentLine] == ru"" or bufStatus.buffer[bufStatus.currentLine][0] == (ru"-")[0]: keyDown(bufStatus)
 
 proc configurationMode*(status: var EditorStatus) =
   status.resize(terminalHeight(), terminalWidth())
@@ -106,10 +113,10 @@ proc configurationMode*(status: var EditorStatus) =
 
     elif isControlV(key):
       status.changeMode(Mode.visualBlock)
-    elif key == ord('k') or isUpKey(key):
-      keyUp(status.bufStatus[currentBuf])
+    elif (key == ord('k') or isUpKey(key)) and status.bufStatus[currentBuf].currentLine > 1:
+      cursorUp(status.bufStatus[currentBuf])
     elif key == ord('j') or isDownKey(key) or isEnterKey(key):
-      keyDown(status.bufStatus[currentBuf])
+      cursorDown(status.bufStatus[currentBuf])
     else:
       discard
 
