@@ -79,11 +79,19 @@ proc exitConfigMode(status: var Editorstatus) =
 
 proc cursorUp(bufStatus: var BufferStatus) =
   keyUp(bufStatus)
+  ## Skip section name and empty line
   while bufStatus.buffer[bufStatus.currentLine] == ru"" or  bufStatus.buffer[bufStatus.currentLine][0] == (ru"-")[0]: keyUp(bufStatus)
 
 proc cursorDown(bufStatus: var BufferStatus) =
   keyDown(bufStatus)
+  ## Skip section name and empty line
   while bufStatus.buffer[bufStatus.currentLine] == ru"" or bufStatus.buffer[bufStatus.currentLine][0] == (ru"-")[0]: keyDown(bufStatus)
+
+proc changeSettings(bufStatus: var BufferStatus, settings: var EditorSettings) =
+  let setting = (($bufStatus.buffer[bufStatus.currentLine]).splitWhiteSpace)[0]
+  case $setting
+  of "lineNumber":
+    if settings.lineNumber: settings.lineNumber = false else: settings.lineNumber = false
 
 proc configurationMode*(status: var EditorStatus) =
   status.resize(terminalHeight(), terminalWidth())
@@ -111,8 +119,8 @@ proc configurationMode*(status: var EditorStatus) =
     elif isControlJ(key):
       movePrevWindow(status)
 
-    elif isControlV(key):
-      status.changeMode(Mode.visualBlock)
+    elif isEnterKey(key):
+      changeSettings(status.bufStatus[currentBuf], status.settings)
     elif (key == ord('k') or isUpKey(key)) and status.bufStatus[currentBuf].currentLine > 1:
       cursorUp(status.bufStatus[currentBuf])
     elif key == ord('j') or isDownKey(key) or isEnterKey(key):
