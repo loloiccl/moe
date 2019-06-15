@@ -45,12 +45,12 @@ proc setConfigBuffer(bufStatus: var BufferStatus, settings: EditorSettings) =
   bufStatus.buffer.add(ru"")
 
   bufStatus.buffer.add(ru"-- Tab line settings --")
-  bufStatus.buffer.add(ru"Use Tab bar ")
+  bufStatus.buffer.add(ru"useTabLine ")
   bufStatus.buffer[bufStatus.buffer.high].insert(settings.tabLine.useTab.boolToRune, bufStatus.buffer[bufStatus.buffer.high].len)
   bufStatus.buffer.add(ru"")
 
   bufStatus.buffer.add(ru"-- Status bar settings --")
-  bufStatus.buffer.add(ru"useBar ")
+  bufStatus.buffer.add(ru"useStatusBar ")
   bufStatus.buffer[bufStatus.buffer.high].insert(settings.statusBar.useBar.boolToRune, bufStatus.buffer[bufStatus.buffer.high].len)
   bufStatus.buffer.add(ru"mode ")
   bufStatus.buffer[bufStatus.buffer.high].insert(settings.statusBar.mode.boolToRune, bufStatus.buffer[bufStatus.buffer.high].len)
@@ -91,7 +91,35 @@ proc changeSettings(bufStatus: var BufferStatus, settings: var EditorSettings) =
   let setting = (($bufStatus.buffer[bufStatus.currentLine]).splitWhiteSpace)[0]
   case $setting
   of "lineNumber":
-    if settings.lineNumber: settings.lineNumber = false else: settings.lineNumber = false
+    settings.lineNumber = if settings.lineNumber: false else: false
+  of "currentLineNumber":
+    settings.currentLineNumber = if settings.currentLineNumber: false else: true
+  of "cursorLine":
+    settings.cursorLine = if settings.cursorLine: false else: true
+  of "syntax":
+    settings.syntax = if settings.syntax: false else: true
+  of "autoCloseParen":
+    settings.autoCloseParen = if settings.autoCloseParen: false else: true
+  of "autoIndent":
+    settings.autoIndent = if settings.autoIndent: false else: true
+  of "useTabLine":
+    settings.tabLine.useTab = if settings.tabLine.useTab: false else: true
+  of "useStatusBar":
+    settings.statusBar.useBar = if settings.statusbar.useBar: false else: true
+  of "mode":
+    settings.statusbar.mode = if settings.statusbar.mode: false else: true
+  of "filename":
+    settings.statusbar.filename = if settings.statusbar.filename: false else: true
+  of "chanedMark":
+    settings.statusbar.chanedMark = if settings.statusbar.chanedMark: false else: true
+  of "line":
+    settings.statusbar.line = if settings.statusbar.line: false else: true
+  of "column":
+    settings.statusbar.column = if settings.statusbar.column: false else: true
+  of "language":
+    settings.statusbar.language = if settings.statusbar.language: false else: true
+  of "directory":
+    settings.statusbar.directory = if settings.statusbar.directory: false else: true
 
 proc configurationMode*(status: var EditorStatus) =
   status.resize(terminalHeight(), terminalWidth())
