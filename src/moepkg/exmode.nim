@@ -166,7 +166,7 @@ proc changeThemeSettingCommand(status: var EditorStatus, command: seq[Rune]) =
   elif command == ru"config": status.settings.editorColorTheme = ColorTheme.config
 
   changeTheme(status)
-  status.resize(terminalHeight(), terminalWidth())
+  status.resize()
   status.commandWindow.erase
   status.changeMode(status.bufStatus[status.currentBuffer].prevMode)
 
@@ -174,7 +174,7 @@ proc tabLineSettingCommand(status: var EditorStatus, command: seq[Rune]) =
   if command == ru"on": status.settings.tabLine.useTab = true
   elif command == ru"off": status.settings.tabLine.useTab = false
 
-  status.resize(terminalHeight(), terminalWidth())
+  status.resize()
   status.commandWindow.erase
 
 proc syntaxSettingCommand(status: var EditorStatus, command: seq[Rune]) =
@@ -419,7 +419,7 @@ proc listAllBufferCommand(status: var Editorstatus) =
     status.update
     setCursor(false)
     let key = getKey(status.mainWindowInfo[status.currentMainWindow].window)
-    if isResizekey(key): status.resize(terminalHeight(), terminalWidth())
+    if isResizekey(key): status.resize()
     elif key.int == 0: discard
     else: break
 

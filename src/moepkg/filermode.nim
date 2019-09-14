@@ -208,7 +208,7 @@ proc fileNameToGapBuffer(bufStatus: var BufferStatus, settings: EditorSettings, 
 
 proc updateFilerView(status: var EditorStatus, filerStatus: var FilerStatus) =
   fileNameToGapBuffer(status.bufStatus[status.currentBuffer], status.settings, filerStatus)
-  status.resize(terminalHeight(), terminalWidth())
+  status.resize()
   status.update
   filerStatus.viewUpdate = false
 
@@ -245,7 +245,7 @@ proc writefileDetail(status: var Editorstatus, numOfFile: int, fileName: string)
   status.update
   setCursor(false)
   while isResizekey(status.mainWindowInfo[status.currentMainWindow].window.getKey):
-    status.resize(terminalHeight(), terminalWidth())
+    status.resize()
     status.update
     setCursor(false)
 
@@ -292,7 +292,7 @@ proc filerMode*(status: var EditorStatus) =
     if key == ord(':'): status.changeMode(Mode.ex)
 
     elif isResizekey(key):
-      status.resize(terminalHeight(), terminalWidth())
+      status.resize()
       filerStatus.viewUpdate = true
 
     elif key == ord('/'): searchFileMode(status, filerStatus)

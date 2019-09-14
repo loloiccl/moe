@@ -698,7 +698,7 @@ proc normalCommand(status: var EditorStatus, key: Rune) =
 
 proc normalMode*(status: var EditorStatus) =
   status.bufStatus[status.currentBuffer].cmdLoop = 0
-  status.resize(terminalHeight(), terminalWidth())
+  status.resize()
   var countChange = 0
 
   changeCursorType(status.settings.normalModeCursor)
@@ -726,7 +726,7 @@ proc normalMode*(status: var EditorStatus) =
       else: key = keyAfterEsc
 
     if isResizekey(key):
-      status.resize(terminalHeight(), terminalWidth())
+      status.resize()
     elif key == ord('/'):
       status.changeMode(Mode.search)
     elif key == ord(':'):

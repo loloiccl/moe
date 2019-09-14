@@ -102,7 +102,7 @@ proc realtimeSearch(status: var Editorstatus) =
     else: status.bufStatus[status.currentMainWindow].isHighlight = false
 
     status.updateHighlight
-    status.resize(terminalHeight(), terminalWidth())
+    status.resize()
     status.update
 
   if cancelSearch:

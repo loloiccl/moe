@@ -220,7 +220,7 @@ proc getKeyword*(status: var EditorStatus, prompt: string): (seq[Rune], bool) =
       cancelSearch = true
       break
     elif isResizeKey(key):
-      status.resize(terminalHeight(), terminalWidth())
+      status.resize()
       status.update
     elif isLeftKey(key): moveLeft(status.commandWindow, exStatus)
     elif isRightkey(key): moveRight(exStatus)
@@ -250,7 +250,7 @@ proc getKeyOnceAndWriteCommandView*(status: var Editorstatus, prompt: string, bu
       cancelSearch = true
       break
     elif isResizeKey(key):
-      status.resize(terminalHeight(), terminalWidth())
+      status.resize()
       status.update
     elif isLeftKey(key): moveLeft(status.commandWindow, exStatus)
     elif isRightkey(key): moveRight(exStatus)
@@ -365,7 +365,7 @@ proc suggestMode(status: var Editorstatus, exStatus: var ExModeViewStatus, key: 
   
 proc getCommand*(status: var EditorStatus, prompt: string): seq[seq[Rune]] =
   var exStatus = initExModeViewStatus(prompt)
-  status.resize(terminalHeight(), terminalWidth())
+  status.resize()
 
   while true:
     writeExModeView(status.commandWindow, exStatus, EditorColorPair.commandBar)
@@ -379,7 +379,7 @@ proc getCommand*(status: var EditorStatus, prompt: string): seq[seq[Rune]] =
       status.commandWindow.erase
       return @[ru""]
     elif isResizeKey(key):
-      status.resize(terminalHeight(), terminalWidth())
+      status.resize()
       status.update
     elif isLeftKey(key): moveLeft(status.commandWindow, exStatus)
     elif isRightkey(key): moveRight(exStatus)

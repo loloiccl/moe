@@ -36,7 +36,7 @@ proc deleteSelectedBuffer(status: var Editorstatus) =
     if status.bufStatus[status.currentBuffer].currentLine > 0: dec(status.bufStatus[status.currentBuffer].currentLine)
     status.currentMainWindow = status.mainWindowInfo.high
     status.setBufferList
-    status.resize(terminalHeight(), terminalWidth())
+    status.resize()
   
 proc openSelectedBuffer(status: var Editorstatus, isNewWindow: bool) =
   if isNewWindow:
@@ -49,7 +49,7 @@ proc openSelectedBuffer(status: var Editorstatus, isNewWindow: bool) =
 
 proc bufferManager*(status: var Editorstatus) =
   status.setBufferList
-  status.resize(terminalHeight(), terminalWidth())
+  status.resize()
 
   while status.bufStatus[status.currentBuffer].mode == Mode.bufManager:
     status.updateBufferManagerHighlight
@@ -57,7 +57,7 @@ proc bufferManager*(status: var Editorstatus) =
     setCursor(false)
     let key = getKey(status.mainWindowInfo[status.currentMainWindow].window)
 
-    if isResizekey(key): status.resize(terminalHeight(), terminalWidth())
+    if isResizekey(key): status.resize()
     elif isControlK(key): status.moveNextWindow
     elif isControlJ(key): status.movePrevWindow
     elif key == ord(':'): status.changeMode(Mode.ex)

@@ -203,7 +203,7 @@ proc visualBlockCommand(status: var EditorStatus, area: var SelectArea, key: Run
   else: discard
 
 proc visualMode*(status: var EditorStatus) =
-  status.resize(terminalHeight(), terminalWidth())
+  status.resize()
   let currentBuf = status.currentBuffer
 
   var colorSegment = initColorSegment(status.bufStatus[status.currentBuffer].currentLine, status.bufStatus[status.currentBuffer].currentColumn)
@@ -230,7 +230,7 @@ proc visualMode*(status: var EditorStatus) =
     status.bufStatus[status.currentBuffer].tryRecordCurrentPosition
 
     if isResizekey(key):
-      status.resize(terminalHeight(), terminalWidth())
+      status.resize()
     elif isEscKey(key) or isControlSquareBracketsRight(key):
       status.updatehighlight
       status.changeMode(Mode.normal)
