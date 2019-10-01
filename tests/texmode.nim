@@ -1,12 +1,11 @@
 import terminal, unittest
-import moepkg/editorstatus, moepkg/exmode, moepkg/unicodeext, moepkg/gapbuffer
+import moepkg/ui, moepkg/editorstatus, moepkg/exmode, moepkg/unicodeext, moepkg/gapbuffer
 
 test "Change theme command":
   var status = initEditorStatus()
   status.addNewBuffer("")
-  status.bufStatus[0].buffer = initGapBuffer(@[ru"a"])
-  status.resize(terminalHeight(), terminalWidth())
   
+  startUi()
   block:
     const command = @[ru"theme", ru"vivid"]
     status.exModeCommand(command)
