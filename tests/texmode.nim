@@ -1,5 +1,5 @@
 import unittest
-import moepkg/editorstatus, moepkg/exmode, moepkg/unicodeext
+import moepkg/editorstatus, moepkg/exmode, moepkg/unicodeext, moepkg/gapbuffer
 
 test "Change theme command":
   var status = initEditorStatus()
