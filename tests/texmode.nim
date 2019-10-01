@@ -4,6 +4,7 @@ import moepkg/editorstatus, moepkg/exmode, moepkg/unicodeext
 test "Change theme command":
   var status = initEditorStatus()
   status.addNewBuffer("")
+  status.bufStatus[0].buffer = initGapBuffer(@[ru"a"])
   
   block:
     const command = @[ru"theme", ru"vivid"]
